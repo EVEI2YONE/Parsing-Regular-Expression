@@ -69,8 +69,6 @@ void Parser::parse_input()
 void Parser::parse_tokens_section()
 {
 	// tokens_section -> token_list HASH
-
-
 	parse_token_list();
 	expect(HASH);
 }
@@ -79,7 +77,6 @@ void Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
-
 	parse_token();
 	Token t = peek();
 	if (t.token_type == COMMA)
@@ -120,9 +117,28 @@ void Parser::parse_expr()
 	Token t = lexer.GetToken();
 	if (t.token_type == CHAR) {
 		// expr -> CHAR
+		//create start and accept REG
+		REG *expression = (struct REG *)malloc(sizeof(struct REG));
+		//start->a->accept
+		//node_1 represents the start node
+		//while node_2 is the accept node
+		REG_node *node_1 = (struct REG_node *)malloc(sizeof(struct REG_node));
+		REG_node *node_2 = (struct REG_node *)malloc(sizeof(struct REG_node));
+
+		//create single character REG expression
+		node_1->first_neighbor = node_2;
+		node_1->second_neighbor = NULL;
+		node_1->first_label = CHAR;
+
+		expression->start = node_1;
+		expression->accept = node_2;
+		//should return expression
 	}
 	else if (t.token_type == UNDERSCORE) {
 		// expr -> UNDERSCORE
+		//underscore represents epsilon
+		//this is useful as a transition with STAR, AND, OR expressions
+
 	}
 	else if (t.token_type == LPAREN) {
 		// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN

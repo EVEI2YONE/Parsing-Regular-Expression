@@ -1,7 +1,3 @@
-//
-// Created by covmi on 9/10/2018.
-//
-
 #ifndef CSE340_PROJECT1_MY_LEXICALANALYSIS_H
 #define CSE340_PROJECT1_MY_LEXICALANALYSIS_H
 
