@@ -119,7 +119,7 @@ void Parser::parse_expr()
 		// expr -> CHAR
 		//create start and accept REG
 		REG *expression = (struct REG *)malloc(sizeof(struct REG));
-		//start->a->accept
+		//start->char->accept
 		//node_1 represents the start node
 		//while node_2 is the accept node
 		REG_node *node_1 = (struct REG_node *)malloc(sizeof(struct REG_node));
@@ -130,6 +130,9 @@ void Parser::parse_expr()
 		node_1->second_neighbor = NULL;
 		node_1->first_label = CHAR;
 
+		node_2->first_neighbor = NULL;
+		node_2->second_neighbor = NULL;
+		
 		expression->start = node_1;
 		expression->accept = node_2;
 		//should return expression
@@ -138,7 +141,24 @@ void Parser::parse_expr()
 		// expr -> UNDERSCORE
 		//underscore represents epsilon
 		//this is useful as a transition with STAR, AND, OR expressions
+		REG *expression = (struct REG *)malloc(sizeof(struct REG));
+		//start->underscore->accept
+		//node_1 represents start node
+		//while node_2 represents accept node
+		REG_node *node_1 = (struct REG_node *)malloc(sizeof(struct REG_node));
+		REG_node *node_2 = (struct REG_node *)malloc(sizeof(struct REG_node));
 
+		//create single character REG expression
+		node_1->first_neighbor = node_2;
+		node_1->second_neighbor = NULL;
+		node_1->first_label = '_';
+
+		node_2->first_neighbor = NULL;
+		node_2->second_neighbor = NULL;
+		
+		expression->start = node_1;
+		expression->accept = node_2;
+		//should return expression
 	}
 	else if (t.token_type == LPAREN) {
 		// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
