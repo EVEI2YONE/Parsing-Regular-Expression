@@ -127,11 +127,11 @@ void Parser::parse_expr()
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
-		node_1->second_neighbor = NULL;
+		node_1->second_neighbor = nullptr;
 		node_1->first_label = CHAR;
 
-		node_2->first_neighbor = NULL;
-		node_2->second_neighbor = NULL;
+		node_2->first_neighbor = nullptr;
+		node_2->second_neighbor = nullptr;
 		
 		expression->start = node_1;
 		expression->accept = node_2;
@@ -150,11 +150,11 @@ void Parser::parse_expr()
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
-		node_1->second_neighbor = NULL;
+		node_1->second_neighbor = nullptr;
 		node_1->first_label = '_';
 
-		node_2->first_neighbor = NULL;
-		node_2->second_neighbor = NULL;
+		node_2->first_neighbor = nullptr;
+		node_2->second_neighbor = nullptr;
 		
 		expression->start = node_1;
 		expression->accept = node_2;
@@ -187,8 +187,8 @@ void Parser::parse_expr()
 
 				//set up accept node
 				REG_node *accept_node = (struct REG_node *)malloc(sizeof(REG_node));
-				accept_node->first_neighbor = NULL;
-				accept_node->second_neighbor = NULL;
+				accept_node->first_neighbor = nullptr;
+				accept_node->second_neighbor = nullptr;
 
 				//have the end of expression and temp nodes point to accept node
 				expression->accept->first_neighbor = accept_node;
@@ -201,7 +201,7 @@ void Parser::parse_expr()
 				expression->accept = expression->accept->first_neighbor;
 			}
 			//temp is no longer needed
-			temp = NULL;
+			temp = nullptr;
 			expect(RPAREN);
 		}
 		else if (t2.token_type == STAR){
@@ -229,7 +229,7 @@ void Parser::parse_expr()
 	else
 	{
 		syntax_error();
-		return NULL;
+		return nullptr;
 	}
 }
 
