@@ -164,18 +164,33 @@ void Parser::parse_expr()
 		// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
 		// expr -> LPAREN expr RPAREN OR LPAREN expr RPAREN
 		// expr -> LPAREN expr RPAREN STAR
-		parse_expr();
+		REG *expression = (struct REG *)malloc(sizeof(struct REG));
+		REG *temp = parse_expr();
+		expression->start = temp->start;
+		expression->accept = temp->accept;
 		expect(RPAREN);
 		Token t2 = lexer.GetToken();
 		if (t2.token_type == DOT || t2.token_type == OR) {
 			expect(LPAREN);
-			parse_expr();
+			temp = parse_expr();
+			if(t2.token_type == DOT){
+				expression->accept->first_neighbor = temp->start;
+				expression->accept = temp->accept;
+			}
+			else{
+				REG_node *or_node = (struct REG_node *)malloc(sizeof(REG_node));
+				or_node->first_neighbor = expression->start;
+				or_node->second_neighbor = temp->start;
+				//UMM need to keep track of UNDERSCORE nodes <---------------------------------
+			}
+			temp = NULL;
 			expect(RPAREN);
 		}
 		else if (t2.token_type == STAR)
 		{
-
+			
 		}
+		
 
 	}
 	else
