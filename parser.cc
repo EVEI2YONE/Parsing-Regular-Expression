@@ -135,7 +135,7 @@ void Parser::parse_expr()
 		
 		expression->start = node_1;
 		expression->accept = node_2;
-		//should return expression
+		return expression;
 	}
 	else if (t.token_type == UNDERSCORE) {
 		// expr -> UNDERSCORE
@@ -158,7 +158,7 @@ void Parser::parse_expr()
 		
 		expression->start = node_1;
 		expression->accept = node_2;
-		//should return expression
+		return expression;
 	}
 	else if (t.token_type == LPAREN) {
 		// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
@@ -178,24 +178,58 @@ void Parser::parse_expr()
 				expression->accept = temp->accept;
 			}
 			else{
-				REG_node *or_node = (struct REG_node *)malloc(sizeof(REG_node));
-				or_node->first_neighbor = expression->start;
-				or_node->second_neighbor = temp->start;
-				//UMM need to keep track of UNDERSCORE nodes <---------------------------------
+				REG_node *fork_node = (struct REG_node *)malloc(sizeof(REG_node));
+				//have the fork node point the the start of expression and temp nodes
+				fork_node->first_neighbor = expression->start;
+				fork_node->first_label = '_';
+				fork_node->second_neighbor = temp->start;
+				fork_node->second_label = '_';
+
+				//set up accept node
+				REG_node *accept_node = (struct REG_node *)malloc(sizeof(REG_node));
+				accept_node->first_neighbor = NULL;
+				accept_node->second_neighbor = NULL;
+
+				//have the end of expression and temp nodes point to accept node
+				expression->accept->first_neighbor = accept_node;
+				expression->accept->first_label = '_';
+				temp->accept->first_neighbor = accept_node;
+				temp->accept->first_label = accept_node;
+
+				//reassign expression start and accept pointers
+				expression->start = fork_node;
+				expression->accept = expression->accept->first_neighbor;
 			}
+			//temp is no longer needed
 			temp = NULL;
 			expect(RPAREN);
 		}
-		else if (t2.token_type == STAR)
-		{
-			
+		else if (t2.token_type == STAR){
+			REG_node *fork_node = (struct REG_node *)malloc(sizeof(struct REG_node));
+			REG_node *accept_node = (struct REG_node *)malloc(sizeof(struct REG_node));
+			//set up and link fork node to expression->start and accept_node
+			fork_node->first_neighbor = expression->start;
+			fork_node->first_label = '_';
+			fork_node->second_neighbor = accept_node;
+			fork_node->second_label = '_';
+			//set up accept_node
+			accept_node->first_neighbor = nullptr;
+			accept_node->second_neighbor = nullptr;
+			//change expression->accept first, that way second neighbor can have easier access to previous neighbor
+			expression->accept->first_neighbor = accept_node;
+			expression->accept->first_label = '_';
+			expression->accept->second_neighbor = expression->start;
+			expression->accept->second_label = '_';
+			//now that expression->accept is set up, reassign start/accept pointers in expression
+			expression->start = fork_node;
+			expression->accept = accept_node;
 		}
-		
-
+		return expression;
 	}
 	else
 	{
 		syntax_error();
+		return NULL;
 	}
 }
 
