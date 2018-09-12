@@ -13,22 +13,13 @@
 
 using namespace std;
 
-typedef struct REG_node {
-	struct REG_node *first_neighbor;
-	char first_label;
-	struct REG_node *second_neighbor;
-	char second_label;
-};
-
-typedef struct REG {
-	struct REG_node *start;
-	struct REG_node *accept;
-};
-
 void Parser::syntax_error()
 {
 	cout << "SYNTAX ERROR\n";
 	//at some point I need to free up all this malloc items <---------------------------
+	//while (head != nullptr){
+
+	//}
 	exit(1);
 }
 
@@ -61,9 +52,10 @@ Token Parser::peek()
 void Parser::parse_input()
 {
 	//input -> tokens_section INPUT_TEXT
-
 	parse_tokens_section();
 	expect(INPUT_TEXT);
+
+	//this is where I need to get the list of inputs and stuff??<-----------
 }
 
 
@@ -72,13 +64,19 @@ void Parser::parse_tokens_section()
 	// tokens_section -> token_list HASH
 	parse_token_list();
 	expect(HASH);
+	return list;
 }
 
 void Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
-	parse_token();
+	// creating a REG_list
+	REG_list *ptr = parse_token();
+	ptr->next = head;
+	head = ptr;
+	ptr = nullptr;
+	//check if next token is # or ,
 	Token t = peek();
 	if (t.token_type == COMMA)
 	{
@@ -96,18 +94,17 @@ void Parser::parse_token_list()
 	}
 
 }
-
-void Parser::parse_token()
+//returns a REG pointer because a list of REG needs to be created
+REG * Parser::parse_token()
 {
 	// token -> ID expr
-
 	expect(ID);
-	parse_expr();
-
+	REG *expression = parse_expr();
+	return expression;
 }
 //returns REG pointer
 	//this also means that the REG_expression is created recursively
-void Parser::parse_expr()
+REG * Parser::parse_expr()
 {
 	// expr -> CHAR
 	// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
@@ -119,12 +116,12 @@ void Parser::parse_expr()
 	if (t.token_type == CHAR) {
 		// expr -> CHAR
 		//create start and accept REG
-		REG *expression = (struct REG *)malloc(sizeof(struct REG));
+		REG *expression;
 		//start->char->accept
 		//node_1 represents the start node
 		//while node_2 is the accept node
-		REG_node *node_1 = (struct REG_node *)malloc(sizeof(struct REG_node));
-		REG_node *node_2 = (struct REG_node *)malloc(sizeof(struct REG_node));
+		REG_node *node_1;
+		REG_node *node_2;
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
@@ -142,12 +139,12 @@ void Parser::parse_expr()
 		// expr -> UNDERSCORE
 		//underscore represents epsilon
 		//this is useful as a transition with STAR, AND, OR expressions
-		REG *expression = (struct REG *)malloc(sizeof(struct REG));
+		REG *expression;
 		//start->underscore->accept
 		//node_1 represents start node
 		//while node_2 represents accept node
-		REG_node *node_1 = (struct REG_node *)malloc(sizeof(struct REG_node));
-		REG_node *node_2 = (struct REG_node *)malloc(sizeof(struct REG_node));
+		REG_node *node_1;
+		REG_node *node_2;
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
@@ -165,7 +162,7 @@ void Parser::parse_expr()
 		// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
 		// expr -> LPAREN expr RPAREN OR LPAREN expr RPAREN
 		// expr -> LPAREN expr RPAREN STAR
-		REG *expression = (struct REG *)malloc(sizeof(struct REG));
+		REG *expression;
 		REG *temp = parse_expr();
 		expression->start = temp->start;
 		expression->accept = temp->accept;
@@ -179,7 +176,7 @@ void Parser::parse_expr()
 				expression->accept = temp->accept;
 			}
 			else{
-				REG_node *fork_node = (struct REG_node *)malloc(sizeof(REG_node));
+				REG_node *fork_node;
 				//have the fork node point the the start of expression and temp nodes
 				fork_node->first_neighbor = expression->start;
 				fork_node->first_label = '_';
@@ -187,7 +184,7 @@ void Parser::parse_expr()
 				fork_node->second_label = '_';
 
 				//set up accept node
-				REG_node *accept_node = (struct REG_node *)malloc(sizeof(REG_node));
+				REG_node *accept_node;
 				accept_node->first_neighbor = nullptr;
 				accept_node->second_neighbor = nullptr;
 
@@ -206,8 +203,8 @@ void Parser::parse_expr()
 			expect(RPAREN);
 		}
 		else if (t2.token_type == STAR){
-			REG_node *fork_node = (struct REG_node *)malloc(sizeof(struct REG_node));
-			REG_node *accept_node = (struct REG_node *)malloc(sizeof(struct REG_node));
+			REG_node *fork_node;
+			REG_node *accept_node;
 			//set up and link fork node to expression->start and accept_node
 			fork_node->first_neighbor = expression->start;
 			fork_node->first_label = '_';
