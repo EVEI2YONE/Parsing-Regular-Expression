@@ -22,12 +22,13 @@ typedef struct REG_node {
 
 typedef struct REG {
 	struct REG_node *start;
-	struct REG_node *accept
+	struct REG_node *accept;
 };
 
 void Parser::syntax_error()
 {
 	cout << "SYNTAX ERROR\n";
+	//at some point I need to free up all this malloc items <---------------------------
 	exit(1);
 }
 
@@ -226,8 +227,7 @@ void Parser::parse_expr()
 		}
 		return expression;
 	}
-	else
-	{
+	else {
 		syntax_error();
 		return nullptr;
 	}
