@@ -4,10 +4,9 @@
 
 //list of structures needs to be created somewhere <-------------------
 //consists of token_name, reg_pointer
-typedef struct set_of_nodes{
+class set_of_nodes{
     REG *list;
 };
-
 
 //my_LexicalAnalyzer(token_name, reg_pointer); parameters are (UNKNOWN *list, *REG reg_pointer)<------------
 my_LexicalAnalyzer() {

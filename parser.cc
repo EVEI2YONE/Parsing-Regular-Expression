@@ -17,7 +17,7 @@ void Parser::syntax_error()
 {
 	cout << "SYNTAX ERROR\n";
 	//at some point I need to free up all this malloc items <---------------------------
-	//while (head != nullptr){
+	//while (REG_head != nullptr){
 
 	//}
 	exit(1);
@@ -54,28 +54,34 @@ void Parser::parse_input()
 	//input -> tokens_section INPUT_TEXT
 	parse_tokens_section();
 	expect(INPUT_TEXT);
-
+	my_LexicalAnalysis;
 	//this is where I need to get the list of inputs and stuff??<-----------
 }
 
 
-void Parser::parse_tokens_section()
+Track * Parser::parse_tokens_section()
 {
 	// tokens_section -> token_list HASH
-	parse_token_list();
-	expect(HASH);
-	return list;
+	Track *overall = parse_token_list();
+	expect(HASH)
+	return overall;
 }
 
-void Parser::parse_token_list()
+Track * Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
+
+
+
 	// creating a REG_list
-	REG_list *ptr = parse_token();
-	ptr->next = head;
-	head = ptr;
-	ptr = nullptr;
+	//REG_list *ptr =
+			parse_token();
+	//ptr->next = REG_head;
+	//REG_head = ptr;
+	//ptr = nullptr;
+
+
 	//check if next token is # or ,
 	Token t = peek();
 	if (t.token_type == COMMA)
@@ -86,6 +92,10 @@ void Parser::parse_token_list()
 	}
 	else if (t.token_type == HASH)
 	{
+		Track *list;
+		list->reg_pointer = REG_head;
+		list->token_pointer = Token_head;
+		return list;
 		// token_list -> token
 	}
 	else
@@ -95,12 +105,19 @@ void Parser::parse_token_list()
 
 }
 //returns a REG pointer because a list of REG needs to be created
-REG * Parser::parse_token()
+void Parser::parse_token()
 {
 	// token -> ID expr
-	expect(ID);
+	Token_list *temp;
+	temp->tokptr = expect(ID);
+	temp->next = Token_head;
+	Token_head = temp;
+
 	REG *expression = parse_expr();
-	return expression;
+	expression->next = REG_head;
+	REG_head = expression;
+	//return expression;
+	return;
 }
 //returns REG pointer
 	//this also means that the REG_expression is created recursively

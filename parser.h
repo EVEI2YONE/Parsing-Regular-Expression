@@ -10,6 +10,7 @@
 #include "lexer.h"
 
 class REG_node {
+public:
 	REG_node *first_neighbor;
 	char first_label;
 	REG_node *second_neighbor;
@@ -17,14 +18,29 @@ class REG_node {
 };
 
 class REG {
+public:
 	REG_node *start;
 	REG_node *accept;
 };
 
 class REG_list{
-	REG *next;
-}head = nullptr;
+public:
+	REG *expr = nullptr;
+	REG_list *next = nullptr;
+}*REG_head = nullptr;
 
+//this is for variable Track list for when my_LexicalAnalysis is called with the parameter
+//list being a list of structures containing Token pointer and REG pointer
+class Track{
+public:
+	REG_list *reg_pointer;
+	Token_list *token_pointer;
+};
+
+class Token_list{
+	Token *tok_ptr = nullptr;
+	Token *next = nullptr;
+}*Token_head = nullptr;
 
 class Parser {
 private:
