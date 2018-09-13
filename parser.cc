@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "parser.h"
+#include "my_LexicalAnalysis.h"
 
 using namespace std;
 
@@ -52,9 +53,9 @@ Token Parser::peek()
 void Parser::parse_input()
 {
 	//input -> tokens_section INPUT_TEXT
-	parse_tokens_section();
-	expect(INPUT_TEXT);
-	my_LexicalAnalysis;
+	Track *list = parse_tokens_section();
+	Token str = expect(INPUT_TEXT);
+	my_LexicalAnalysis(list, str.lexeme, 0);
 	//this is where I need to get the list of inputs and stuff??<-----------
 }
 
@@ -62,6 +63,7 @@ void Parser::parse_input()
 Track * Parser::parse_tokens_section()
 {
 	// tokens_section -> token_list HASH
+	//the overall variable is the list that is a list of structures passed through to my_LexicalAnalysis parameter
 	Track *overall = parse_token_list();
 	expect(HASH)
 	return overall;
@@ -76,7 +78,7 @@ Track * Parser::parse_token_list()
 
 	// creating a REG_list
 	//REG_list *ptr =
-			parse_token();
+	parse_token();
 	//ptr->next = REG_head;
 	//REG_head = ptr;
 	//ptr = nullptr;
@@ -112,11 +114,12 @@ void Parser::parse_token()
 	temp->tokptr = expect(ID);
 	temp->next = Token_head;
 	Token_head = temp;
+	temp = nullptr;
 
 	REG *expression = parse_expr();
 	expression->next = REG_head;
 	REG_head = expression;
-	//return expression;
+	expression = nullptr;
 	return;
 }
 //returns REG pointer
@@ -130,7 +133,7 @@ REG * Parser::parse_expr()
 	// expr -> UNDERSCORE
 
 	Token t = lexer.GetToken();
-	if (t.token_type == CHAR) {
+	if (t.token_type == CHAR || t.token_type == UNDERSCORE) {
 		// expr -> CHAR
 		//create start and accept REG
 		REG *expression;
@@ -143,30 +146,12 @@ REG * Parser::parse_expr()
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
 		node_1->second_neighbor = nullptr;
-		node_1->first_label = CHAR;
-
-		node_2->first_neighbor = nullptr;
-		node_2->second_neighbor = nullptr;
-		
-		expression->start = node_1;
-		expression->accept = node_2;
-		return expression;
-	}
-	else if (t.token_type == UNDERSCORE) {
-		// expr -> UNDERSCORE
-		//underscore represents epsilon
-		//this is useful as a transition with STAR, AND, OR expressions
-		REG *expression;
-		//start->underscore->accept
-		//node_1 represents start node
-		//while node_2 represents accept node
-		REG_node *node_1;
-		REG_node *node_2;
-
-		//create single character REG expression
-		node_1->first_neighbor = node_2;
-		node_1->second_neighbor = nullptr;
-		node_1->first_label = '_';
+		if(t.token_type == CHAR) {
+			node_1->first_label = CHAR;
+		}
+		else{
+			node_1->first_label = UNDERSCORE;
+		}
 
 		node_2->first_neighbor = nullptr;
 		node_2->second_neighbor = nullptr;
@@ -179,15 +164,12 @@ REG * Parser::parse_expr()
 		// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
 		// expr -> LPAREN expr RPAREN OR LPAREN expr RPAREN
 		// expr -> LPAREN expr RPAREN STAR
-		REG *expression;
-		REG *temp = parse_expr();
-		expression->start = temp->start;
-		expression->accept = temp->accept;
+		REG *expression = parse_expr();
 		expect(RPAREN);
 		Token t2 = lexer.GetToken();
 		if (t2.token_type == DOT || t2.token_type == OR) {
 			expect(LPAREN);
-			temp = parse_expr();
+			REG *temp = parse_expr();
 			if(t2.token_type == DOT){
 				expression->accept->first_neighbor = temp->start;
 				expression->accept = temp->accept;
@@ -216,7 +198,6 @@ REG * Parser::parse_expr()
 				expression->accept = expression->accept->first_neighbor;
 			}
 			//temp is no longer needed
-			temp = nullptr;
 			expect(RPAREN);
 		}
 		else if (t2.token_type == STAR){
