@@ -209,6 +209,13 @@ REG * Parser::parse_expr()
 			expect(RPAREN);
 		}
 		else if (t2.token_type == STAR){
+			/*
+			 * [1]->[2]
+			 * [3]->[1]->[2]->[4]
+			 * [3]->[1]->[2]->[4]
+			 *  |    ^----|    ^
+			 *  |--------------|
+			 */
 			REG_node *fork_node;
 			REG_node *accept_node;
 			num++;

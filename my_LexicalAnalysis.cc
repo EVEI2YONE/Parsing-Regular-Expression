@@ -39,20 +39,59 @@ set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
     // step 1 is the purpose of the do-while loop
     // create
     if (parser == nullptr){
-        //check if epsilon, _
-            if(c == '_'){
-
-            }
-        //parse epsilon nodes
-        //check if char matches next node
-
-
         return nullptr;
     }
     //
     //set_of_nodes has REG pointers
     do{
+        //create new set_of_nodes for viable nodes
+        //check if epsilon, _
+        //accept node
+        if(S->node->first-neighbor == nullptr){
+            return S;
+        }
+        //1st neighbor has epsilon, and no 2nd neighbor
+        else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == nullptr){
+            set_of_sets *temp1;
+            temp1-> s_node = match(temp1->node->first_neighbor);
+            return temp1;
+        }//1st and 2nd neighbors have epsilons
+        else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == '_')){
+            set_of_sets *temp1;
+            temp1->s_node = match_one_char(S->node->first_neighbor);
+            set_of_sets *temp2;
+            temp2->s_node = match_one_char(S->node->second_neighbor);
+            //compare the two temp variables, and return one list union of the two: temp1 U temp2
+            set_of_sets *parse1 = temp1;
+            set_of_sets *parse2 = temp2;
+            set_of_sets *temp_list;
+            do {
+                int flag = 0;
+                do {
+                    if(parse1->s_node->node->node_num == parse2->s_node->node->node_num) {
+                        flag = 1;
+                    }
+                }while(parse1->next != nullptr);
+                //flag = 1 means there is a copy node pointer
+                //flag = 0 means to add the node that parse2 is pointing at to temp_list
+                if(flag == 0) {
+                    //<======================================
+                }
+            }while(parse2->next != nullptr);
+        }
+        else{
+            cout << "my_LexicalAnalysis match_one_char expression" << endl;
+        }
+        //check if char
+        if(c != '_'){
 
+
+
+
+
+        }
+        //parse epsilon nodes
+        //check if char matches next node
         parser = parser->next;
     }while(parser->next != nullptr);
 
