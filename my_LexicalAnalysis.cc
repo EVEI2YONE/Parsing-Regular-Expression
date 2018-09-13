@@ -16,6 +16,13 @@ void my_LexicalAnalysis::my_getToken();
 void my_LexicalAnalysis::match(REG *r, string s, int p);
 
 //page 9 in pdf
+/*
+ * Potential issues: how do I keep track of these sets of nodes in a REG expression?
+ * Do I use pointers?
+ * Do I create multiple sets to keep with n number of REG expressions?
+ * How do I know which pointers aren't pointing to the same node?
+ *      - especially in the same REG expression?
+ */
 set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
     // 1. find all nodes that can be reached from S by consuming c
     //
