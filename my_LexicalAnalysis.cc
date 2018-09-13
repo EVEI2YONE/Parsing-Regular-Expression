@@ -1,14 +1,22 @@
+#include <iostream>
+#include <istream>
+#include <vector>
+#include <string>
+#include <cctype>
 
+using namespace std;
 
+my_LexicalAnalysis::my_LexicalAnalysis(){
 
+}
 
-void my_getToken();
+void my_LexicalAnalysis::my_getToken();
 
 //page 9-10 in pdf
-void match(REG r, String s, int p);
+void my_LexicalAnalysis::match(REG *r, string s, int p);
 
 //page 9 in pdf
-set_of_nodes * match_one_char(set_of_nodes S, char c){
+set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
     // 1. find all nodes that can be reached from S by consuming c
     //
     // S' = empty set
