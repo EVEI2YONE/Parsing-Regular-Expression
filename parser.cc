@@ -104,7 +104,7 @@ Track * Parser::parse_token_list()
 	{
 		syntax_error();
 	}
-
+	num = 1;
 }
 //returns a REG pointer because a list of REG needs to be created
 void Parser::parse_token()
@@ -158,6 +158,11 @@ REG * Parser::parse_expr()
 		
 		expression->start = node_1;
 		expression->accept = node_2;
+
+		node_1->node_num = num;
+		num++;
+		node_2->node_num = num;
+		num++;
 		return expression;
 	}
 	else if (t.token_type == LPAREN) {
@@ -169,6 +174,7 @@ REG * Parser::parse_expr()
 		Token t2 = lexer.GetToken();
 		if (t2.token_type == DOT || t2.token_type == OR) {
 			expect(LPAREN);
+			num++;
 			REG *temp = parse_expr();
 			if(t2.token_type == DOT){
 				expression->accept->first_neighbor = temp->start;
@@ -196,6 +202,10 @@ REG * Parser::parse_expr()
 				//reassign expression start and accept pointers
 				expression->start = fork_node;
 				expression->accept = expression->accept->first_neighbor;
+				num++;
+				fork_node->node_num = num;
+				num++;
+				accept_node->node_num = num;
 			}
 			//temp is no longer needed
 			expect(RPAREN);
@@ -203,6 +213,10 @@ REG * Parser::parse_expr()
 		else if (t2.token_type == STAR){
 			REG_node *fork_node;
 			REG_node *accept_node;
+			num++;
+			fork_node->node_num = num;
+			num++;
+			accept_node->node_num = num;
 			//set up and link fork node to expression->start and accept_node
 			fork_node->first_neighbor = expression->start;
 			fork_node->first_label = '_';

@@ -46,7 +46,7 @@ class Token_list{
 class Parser {
 private:
 	LexicalAnalyzer lexer;
-
+	int num = 1;
 	void syntax_error();
 	Token expect(TokenType expected_type);
 	Token peek();
