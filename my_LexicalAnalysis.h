@@ -7,7 +7,7 @@
 //consists of token_name, reg_pointer
 class set_of_nodes{
     REG_node *node = nullptr;
-    REG_node *next = nullptr;
+    set_of_nodes *next = nullptr;
 };
 
 class set_of_sets{
@@ -18,6 +18,7 @@ class set_of_sets{
 
 class my_LexicalAnalyzer {
 private:
+
 public:
     my_LexicalAnalysis(Track *list, string s);
     Token * my_getToken();

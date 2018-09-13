@@ -33,12 +33,15 @@ public:
 //this is for variable Track list for when my_LexicalAnalysis is called with the parameter
 //list being a list of structures containing Token pointer and REG pointer
 class Track{
+private:
 public:
 	REG_list *reg_pointer;
 	Token_list *token_pointer;
 };
 
 class Token_list{
+private:
+public:
 	Token *tok_ptr = nullptr;
 	Token *next = nullptr;
 }*Token_head = nullptr;
