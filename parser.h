@@ -15,6 +15,7 @@ public:
 	char first_label;
 	REG_node *second_neighbor;
 	char second_label;
+	int node_num;
 };
 
 class REG {
@@ -23,7 +24,7 @@ public:
 	REG_node *accept;
 };
 
-class REG_list{
+class REG_list {
 public:
 	REG *expr = nullptr;
 	REG_list *next = nullptr;
