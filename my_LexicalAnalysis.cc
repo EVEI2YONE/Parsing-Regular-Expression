@@ -6,14 +6,20 @@
 
 using namespace std;
 
-my_LexicalAnalysis::my_LexicalAnalysis(){
+my_LexicalAnalysis::my_LexicalAnalysis(Track *list, string s){
+
+}
+void free_set(set_of_sets *S){
+
+}
+void my_LexicalAnalysis::my_getToken(){
 
 }
 
-void my_LexicalAnalysis::my_getToken();
-
 //page 9-10 in pdf
-void my_LexicalAnalysis::match(REG *r, string s, int p);
+void my_LexicalAnalysis::match(REG *r, string s, int p){
+
+}
 
 //page 9 in pdf
 /*
@@ -24,8 +30,32 @@ void my_LexicalAnalysis::match(REG *r, string s, int p);
  *      - especially in the same REG expression?
  */
 set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
-    // 1. find all nodes that can be reached from S by consuming c
+    // Goal: find all nodes that can be reached from S by consuming c
+    // 1. parse through S and list viable nodes that can be reached from S
+    // 2. if accept state is reached, update set_of_sets parser on - character, string length, or position <------------
+    // 3. new set_of_nodes list needs to be created and returned
+    set_of_nodes *update;
+    set_of_nodes *parser = set_of_nodes;
+    // step 1 is the purpose of the do-while loop
+    // create
+    if (parser == nullptr){
+        //check if epsilon, _
+            if(c == '_'){
+
+            }
+        //parse epsilon nodes
+        //check if char matches next node
+
+
+        return nullptr;
+    }
     //
+    //set_of_nodes has REG pointers
+    do{
+
+        parser = parser->next;
+    }while(parser->next != nullptr);
+
     // S' = empty set
     // for every node n in S
     // if ( (there is an edge from n to m labeled with c) &&

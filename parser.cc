@@ -7,6 +7,8 @@
 * of this file online
 *
 */
+
+//possible need to have #include "iostream.h" - maybe <----------------------------------------
 #include <iostream>
 #include <cstdlib>
 #include "parser.h"
@@ -17,10 +19,6 @@ using namespace std;
 void Parser::syntax_error()
 {
 	cout << "SYNTAX ERROR\n";
-	//at some point I need to free up all this malloc items <---------------------------
-	//while (REG_head != nullptr){
-
-	//}
 	exit(1);
 }
 
