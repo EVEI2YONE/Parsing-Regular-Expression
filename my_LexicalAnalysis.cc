@@ -34,8 +34,8 @@ set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
     // 1. parse through S and list viable nodes that can be reached from S
     // 2. if accept state is reached, update set_of_sets parser on - character, string length, or position <------------
     // 3. new set_of_nodes list needs to be created and returned
-    set_of_nodes *update;
-    set_of_nodes *parser = set_of_nodes;
+    set_of_nodes *update = nullptr; //acts as the head of updated list
+    set_of_nodes *parser = S;
     // step 1 is the purpose of the do-while loop
     // create
     if (parser == nullptr){
@@ -52,30 +52,33 @@ set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
         }
         //1st neighbor has epsilon, and no 2nd neighbor
         else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == nullptr){
-            set_of_sets *temp1;
-            temp1-> s_node = match(temp1->node->first_neighbor);
-            return temp1;
+            update = match(temp1->node->first_neighbor);
+            return update;
         }//1st and 2nd neighbors have epsilons
         else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == '_')){
-            set_of_sets *temp1;
-            temp1->s_node = match_one_char(S->node->first_neighbor);
-            set_of_sets *temp2;
-            temp2->s_node = match_one_char(S->node->second_neighbor);
+            set_of_nodes *temp1;
+            temp1->node = match_one_char(S->node->first_neighbor);
+            set_of_nodes *temp2;
+            temp2->node = match_one_char(S->node->second_neighbor);
+            //temp1 and temp2 are the heads of received list of nodes
+            //parse them for comparative purposes
+            set_of_nodes *parse1;
+            parse1->node = temp1;
+            set_of_nodes *parse2;
+            parse2->node = temp2;
             //compare the two temp variables, and return one list union of the two: temp1 U temp2
-            set_of_sets *parse1 = temp1;
-            set_of_sets *parse2 = temp2;
-            set_of_sets *temp_list;
             do {
                 int flag = 0;
                 do {
-                    if(parse1->s_node->node->node_num == parse2->s_node->node->node_num) {
+                    if(parse1->node->node_num == parse2->node->node_num) {
                         flag = 1;
                     }
                 }while(parse1->next != nullptr);
-                //flag = 1 means there is a copy node pointer
-                //flag = 0 means to add the node that parse2 is pointing at to temp_list
                 if(flag == 0) {
-                    //<======================================
+                    set_of_nodes *temp3;
+                    temp3->node = parser2;
+                    temp3->next = update;
+                    update = temp3;
                 }
             }while(parse2->next != nullptr);
         }
