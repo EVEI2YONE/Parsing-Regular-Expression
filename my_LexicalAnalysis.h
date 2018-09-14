@@ -27,4 +27,4 @@ public:
     void free_set(set_of_sets *S);
 }
 
-#endif //CSE340_PROJECT1_MY_LEXICALANALYSIS_H
+#endif //__MY_LEXICALANALYSIS_H__
