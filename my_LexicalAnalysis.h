@@ -6,8 +6,8 @@
 //list of structures needs to be created somewhere <-------------------
 //consists of token_name, reg_pointer
 class set_of_nodes{
-    REG_node *node = nullptr;
-    set_of_nodes *next = nullptr;
+    REG_node *node;
+    REG_node *next;
 };
 
 class set_of_sets{
@@ -18,13 +18,12 @@ class set_of_sets{
 
 class my_LexicalAnalyzer {
 private:
-
 public:
     my_LexicalAnalysis(Track *list, string s);
     Token * my_getToken();
-    void match(REG *r, string s, int p);
+    void match(REG *r, String s, int p);
     set_of_nodes * match_one_char(set_of_nodes *S, char c);
     void free_set(set_of_sets *S);
 }
 
-#endif //__MY_LEXICALANALYSIS_H__
+#endif //CSE340_PROJECT1_MY_LEXICALANALYSIS_H

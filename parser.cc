@@ -71,7 +71,16 @@ Track * Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
+
+
+
+	// creating a REG_list
+	//REG_list *ptr =
 	parse_token();
+	//ptr->next = REG_head;
+	//REG_head = ptr;
+	//ptr = nullptr;
+
 
 	//check if next token is # or ,
 	Token t = peek();
@@ -89,9 +98,11 @@ Track * Parser::parse_token_list()
 		return list;
 		// token_list -> token
 	}
-	else {
+	else
+	{
 		syntax_error();
 	}
+	num = 1;
 }
 //returns a REG pointer because a list of REG needs to be created
 void Parser::parse_token()
@@ -110,7 +121,7 @@ void Parser::parse_token()
 	return;
 }
 //returns REG pointer
-	//this also means that the REG_expression is created recursively
+//this also means that the REG_expression is created recursively
 REG * Parser::parse_expr()
 {
 	// expr -> CHAR
@@ -123,12 +134,12 @@ REG * Parser::parse_expr()
 	if (t.token_type == CHAR || t.token_type == UNDERSCORE) {
 		// expr -> CHAR
 		//create start and accept REG
-		REG *expression = new REG();
+		REG *expression;
 		//start->char->accept
 		//node_1 represents the start node
 		//while node_2 is the accept node
-		REG_node *node_1 = new REG_node;
-		REG_node *node_2 = new REG_node;
+		REG_node *node_1;
+		REG_node *node_2;
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
@@ -142,9 +153,14 @@ REG * Parser::parse_expr()
 
 		node_2->first_neighbor = nullptr;
 		node_2->second_neighbor = nullptr;
-		
+
 		expression->start = node_1;
 		expression->accept = node_2;
+
+		node_1->node_num = num;
+		num++;
+		node_2->node_num = num;
+		num++;
 		return expression;
 	}
 	else if (t.token_type == LPAREN) {
@@ -156,13 +172,14 @@ REG * Parser::parse_expr()
 		Token t2 = lexer.GetToken();
 		if (t2.token_type == DOT || t2.token_type == OR) {
 			expect(LPAREN);
+			num++;
 			REG *temp = parse_expr();
 			if(t2.token_type == DOT){
 				expression->accept->first_neighbor = temp->start;
 				expression->accept = temp->accept;
 			}
 			else{
-				REG_node *fork_node = new REG_node;
+				REG_node *fork_node;
 				//have the fork node point the the start of expression and temp nodes
 				fork_node->first_neighbor = expression->start;
 				fork_node->first_label = '_';
@@ -170,7 +187,7 @@ REG * Parser::parse_expr()
 				fork_node->second_label = '_';
 
 				//set up accept node
-				REG_node *accept_node = new REG_node;
+				REG_node *accept_node;
 				accept_node->first_neighbor = nullptr;
 				accept_node->second_neighbor = nullptr;
 
@@ -183,13 +200,21 @@ REG * Parser::parse_expr()
 				//reassign expression start and accept pointers
 				expression->start = fork_node;
 				expression->accept = expression->accept->first_neighbor;
+				num++;
+				fork_node->node_num = num;
+				num++;
+				accept_node->node_num = num;
 			}
 			//temp is no longer needed
 			expect(RPAREN);
 		}
 		else if (t2.token_type == STAR){
-			REG_node *fork_node = new REG_node;
-			REG_node *accept_node = new REG_node;
+			REG_node *fork_node;
+			REG_node *accept_node;
+			num++;
+			fork_node->node_num = num;
+			num++;
+			accept_node->node_num = num;
 			//set up and link fork node to expression->start and accept_node
 			fork_node->first_neighbor = expression->start;
 			fork_node->first_label = '_';
@@ -211,6 +236,7 @@ REG * Parser::parse_expr()
 	}
 	else {
 		syntax_error();
+		return nullptr;
 	}
 }
 
