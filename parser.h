@@ -8,6 +8,7 @@
 
 #include <string>
 #include "lexer.h"
+#include "my_LexicalAnalysis.h"
 
 class REG_node {
 public:

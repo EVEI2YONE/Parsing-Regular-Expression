@@ -1,5 +1,5 @@
-#ifndef __MY_LEXICALANALYSIS_H__
-#define __MY_LEXICALANALYSIS_H__
+#ifndef __MY_LEXICALANALYZER__H__
+#define __MY_LEXICALANALYZER__H__
 
 #include <string>
 
@@ -26,4 +26,4 @@ public:
     void free_set(set_of_sets *S);
 }
 
-#endif //CSE340_PROJECT1_MY_LEXICALANALYSIS_H
+#endif //CSE340_PROJECT1_MY_LEXICALANALYZER_H

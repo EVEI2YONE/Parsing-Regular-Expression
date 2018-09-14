@@ -53,7 +53,9 @@ void Parser::parse_input()
 	//input -> tokens_section INPUT_TEXT
 	Track *list = parse_tokens_section();
 	Token str = expect(INPUT_TEXT);
-	my_LexicalAnalysis(list, str.lexeme, 0);
+	cout << str << endl;
+	cin >> str;
+	//my_LexicalAnalysis(list, str.lexeme, 0);
 	//this is where I need to get the list of inputs and stuff??<-----------
 }
 
