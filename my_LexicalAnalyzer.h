@@ -19,10 +19,10 @@ class set_of_sets{
 class my_LexicalAnalyzer {
 private:
 public:
-    my_LexicalAnalysis(Track *list, string s);
-    Token * my_getToken();
+    analyze(Track *list, string s);
+    Token* my_getToken();
     void match(REG *r, String s, int p);
-    set_of_nodes * match_one_char(set_of_nodes *S, char c);
+    set_of_nodes* match_one_char(set_of_nodes *S, char c);
     void free_set(set_of_sets *S);
 }
 

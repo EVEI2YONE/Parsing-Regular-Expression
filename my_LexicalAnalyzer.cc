@@ -6,18 +6,18 @@
 
 using namespace std;
 
-my_LexicalAnalysis::my_LexicalAnalysis(Track *list, string s){
-
+void my_LexicalAnalyzer::analyze(Track *list, string s){
+    std::cout << "testing" << endl;
 }
 void free_set(set_of_sets *S){
 
 }
-void my_LexicalAnalysis::my_getToken(){
+void my_LexicalAnalyzer::my_getToken(){
 
 }
 
 //page 9-10 in pdf
-void my_LexicalAnalysis::match(REG *r, string s, int p){
+void my_LexicalAnalyzer::match(REG *r, string s, int p){
 
 }
 
@@ -29,7 +29,7 @@ void my_LexicalAnalysis::match(REG *r, string s, int p){
  * How do I know which pointers aren't pointing to the same node?
  *      - especially in the same REG expression?
  */
-set_of_nodes * my_LexicalAnalysis::match_one_char(set_of_nodes *S, char c){
+set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     // Goal: find all nodes that can be reached from S by consuming c
     // 1. parse through S and list viable nodes that can be reached from S
     // 2. if accept state is reached, update set_of_sets parser on - character, string length, or position <------------

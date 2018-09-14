@@ -8,7 +8,7 @@
 
 #include <string>
 #include "lexer.h"
-#include "my_LexicalAnalysis.h"
+#include "my_LexicalAnalyzer.h"
 
 class REG_node {
 public:
@@ -41,12 +41,13 @@ public:
 
 class Token_list{
     Token *tok_ptr = nullptr;
-    Token *next = nullptr;
+    Token_list *next = nullptr;
 }*Token_head = nullptr;
 
 class Parser {
 private:
     LexicalAnalyzer lexer;
+    my_LexicalAnalyzer analyzer;
     int num = 1;
     void syntax_error();
     Token expect(TokenType expected_type);
@@ -57,8 +58,8 @@ private:
     void parse_char_list();
     void parse_tokens_section();
     void parse_token_list();
-    REG * parse_token();
-    REG * parse_expr();
+    void parse_token();
+    REG* parse_expr();
 
 
 public:

@@ -12,7 +12,6 @@
 #include <iostream>
 #include <cstdlib>
 #include "parser.h"
-#include "my_LexicalAnalysis.h"
 
 using namespace std;
 
@@ -55,12 +54,14 @@ void Parser::parse_input()
 	Token str = expect(INPUT_TEXT);
 	cout << str << endl;
 	cin >> str;
+
+	//analyzer.my_LexicalAnalysis(list, str.lexeme, 0);
 	//my_LexicalAnalysis(list, str.lexeme, 0);
 	//this is where I need to get the list of inputs and stuff??<-----------
 }
 
 
-Track * Parser::parse_tokens_section()
+Track* Parser::parse_tokens_section()
 {
 	// tokens_section -> token_list HASH
 	//the overall variable is the list that is a list of structures passed through to my_LexicalAnalysis parameter
@@ -69,7 +70,7 @@ Track * Parser::parse_tokens_section()
 	return overall;
 }
 
-Track * Parser::parse_token_list()
+Track* Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
@@ -110,21 +111,24 @@ Track * Parser::parse_token_list()
 void Parser::parse_token()
 {
 	// token -> ID expr
-	Token_list *temp;
-	temp->tokptr = expect(ID);
-	temp->next = Token_head;
-	Token_head = temp;
-	temp = nullptr;
+	Token_list *temp_token;
+	temp_token->tokptr = expect(ID);
+	temp_token->next = Token_head;
+	Token_head = temp_token;
+	temp_token = nullptr;
 
 	REG *expression = parse_expr();
-	expression->next = REG_head;
-	REG_head = expression;
+	REG_list *temp_expr;
+	temp_expr->expr = expression;
+	temp_expr->next = REG_head;
+	REG_head = temp_expr;
 	expression = nullptr;
+	temp_expr = nullptr;
 	return;
 }
 //returns REG pointer
 //this also means that the REG_expression is created recursively
-REG * Parser::parse_expr()
+REG* Parser::parse_expr()
 {
 	// expr -> CHAR
 	// expr -> LPAREN expr RPAREN DOT LPAREN expr RPAREN
@@ -197,7 +201,7 @@ REG * Parser::parse_expr()
 				expression->accept->first_neighbor = accept_node;
 				expression->accept->first_label = '_';
 				temp->accept->first_neighbor = accept_node;
-				temp->accept->first_label = accept_node;
+				temp->accept->first_label = '_';
 
 				//reassign expression start and accept pointers
 				expression->start = fork_node;
