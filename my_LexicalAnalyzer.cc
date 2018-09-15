@@ -5,8 +5,8 @@
 #include <cctype>
 
 #include "my_LexicalAnalyzer.h"
-
 using namespace std;
+
 set_of_sets *sets_head = new set_of_sets();
 
 /*
@@ -98,5 +98,6 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         //parse epsilon nodes
         //check if char matches next node
         parser = parser->next;
-    }while(parser->next != nullptr);
+    }while(parser->next != NULL);
 }
+

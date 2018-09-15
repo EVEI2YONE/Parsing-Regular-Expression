@@ -8,8 +8,6 @@
 
 #include <string>
 #include "lexer.h"
-#include "my_LexicalAnalyzer.h"
-
 
 class Parser {
 private:

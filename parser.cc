@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "parser.h"
+#include "my_LexicalAnalyzer.h"
 
 using namespace std;
 

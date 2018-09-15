@@ -1,8 +1,8 @@
 #ifndef __MY_LEXICALANALYZER__H__
 #define __MY_LEXICALANALYZER__H__
 
+#include "parser.h"
 #include <string>
-
 class REG_node {
 public:
     REG_node *first_neighbor;
@@ -92,4 +92,5 @@ public:
     set_of_nodes* match_one_char(set_of_nodes *S, char c);
     void free_set(set_of_sets *S);
 };
+
 #endif //CSE340_PROJECT1_MY_LEXICALANALYZER_H
