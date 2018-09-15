@@ -7,6 +7,8 @@
 #include "my_LexicalAnalyzer.h"
 
 using namespace std;
+set_of_sets *sets_head = new set_of_sets();
+
 /*
 void my_LexicalAnalyzer::analyze(Track *list, string s){
     cout << "testing" << endl;
@@ -41,8 +43,8 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     set_of_nodes *parser = set_of_nodes;
     // step 1 is the purpose of the do-while loop
     // create
-    if (parser == nullptr){
-        return nullptr;
+    if (parser == NULL){
+        return NULL;
     }
     //
     //set_of_nodes has REG pointers
@@ -50,16 +52,16 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         //create new set_of_nodes for viable nodes
         //check if epsilon, _
         //accept node
-        if(S->node->first-neighbor == nullptr){
+        if(S->node->first-neighbor == NULL){
             return S;
         }
             //1st neighbor has epsilon, and no 2nd neighbor
-        else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == nullptr){
+        else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == NULL){
             set_of_sets *temp1;
             temp1-> s_node = match(temp1->node->first_neighbor);
             return temp1;
         }//1st and 2nd neighbors have epsilons
-        else if((parser->node->first_neighbor == '_') && parser->node->second_neighbor == '_')){
+        else if((parser->node->first_neighbor == '_') && (parser->node->second_neighbor == '_')){
             set_of_sets *temp1;
             temp1->s_node = match_one_char(S->node->first_neighbor);
             set_of_sets *temp2;
@@ -74,13 +76,13 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
                     if(parse1->s_node->node->node_num == parse2->s_node->node->node_num) {
                         flag = 1;
                     }
-                }while(parse1->next != nullptr);
+                }while(parse1->next != NULL);
                 //flag = 1 means there is a copy node pointer
                 //flag = 0 means to add the node that parse2 is pointing at to temp_list
                 if(flag == 0) {
                     //<======================================
                 }
-            }while(parse2->next != nullptr);
+            }while(parse2->next != NULL);
         }
         else{
             cout << "my_LexicalAnalysis match_one_char expression" << endl;

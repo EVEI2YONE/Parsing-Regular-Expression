@@ -108,13 +108,13 @@ void Parser::parse_token()
 	temp_token->tok_ptr->token_type = temp1.token_type;
 	temp_token->next = list->list_pointer;
 	list->list_pointer = temp_token;
-	temp_token = nullptr;
+	temp_token = NULL;
 
 	REG_list *temp_expr;
 	temp_expr->expr = parse_expr();
 	temp_expr->next = list->reg_pointer;
 	list->reg_pointer = temp_expr;
-	temp_expr = nullptr;
+	temp_expr = NULL;
 	num = 1;
 	return;
 }
@@ -141,7 +141,7 @@ REG* Parser::parse_expr()
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
-		node_1->second_neighbor = nullptr;
+		node_1->second_neighbor = NULL;
 		if(t.token_type == CHAR) {
 			node_1->first_label = CHAR;
 		}
@@ -149,8 +149,8 @@ REG* Parser::parse_expr()
 			node_1->first_label = UNDERSCORE;
 		}
 
-		node_2->first_neighbor = nullptr;
-		node_2->second_neighbor = nullptr;
+		node_2->first_neighbor = NULL;
+		node_2->second_neighbor = NULL;
 
 		expression->start = node_1;
 		expression->accept = node_2;
@@ -186,8 +186,8 @@ REG* Parser::parse_expr()
 
 				//set up accept node
 				REG_node *accept_node;
-				accept_node->first_neighbor = nullptr;
-				accept_node->second_neighbor = nullptr;
+				accept_node->first_neighbor = NULL;
+				accept_node->second_neighbor = NULL;
 
 				//have the end of expression and temp nodes point to accept node
 				expression->accept->first_neighbor = accept_node;
@@ -198,8 +198,8 @@ REG* Parser::parse_expr()
 				//reassign expression start and accept pointers
 				expression->start = fork_node;
 				expression->accept = accept_node;
-				temp->accept = nullptr;
-				temp->start = nullptr;
+				temp->accept = NULL;
+				temp->start = NULL;
 				fork_node->node_num = num;
 				num++;
 				accept_node->node_num = num;
@@ -223,8 +223,8 @@ REG* Parser::parse_expr()
 			fork_node->second_label = '_';
 
 			//set up accept_node
-			accept_node->first_neighbor = nullptr;
-			accept_node->second_neighbor = nullptr;
+			accept_node->first_neighbor = NULL;
+			accept_node->second_neighbor = NULL;
 
 			//change expression->accept first, that way second neighbor can have easier access to previous neighbor
 			expression->accept->first_neighbor = accept_node;
@@ -240,7 +240,7 @@ REG* Parser::parse_expr()
 	}
 	else {
 		syntax_error();
-		return nullptr;
+		return NULL;
 	}
 }
 
