@@ -4,11 +4,14 @@
 #include <string>
 #include <cctype>
 
-using namespace std;
+#include "my_LexicalAnalyzer.h"
 
+using namespace std;
+/*
 void my_LexicalAnalyzer::analyze(Track *list, string s){
-    std::cout << "testing" << endl;
+    cout << "testing" << endl;
 }
+ */
 void free_set(set_of_sets *S){
 
 }
@@ -43,7 +46,7 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     }
     //
     //set_of_nodes has REG pointers
-    do{
+    do {
         //create new set_of_nodes for viable nodes
         //check if epsilon, _
         //accept node
@@ -94,46 +97,4 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         //check if char matches next node
         parser = parser->next;
     }while(parser->next != nullptr);
-
-    // S' = empty set
-    // for every node n in S
-    // if ( (there is an edge from n to m labeled with c) &&
-    // ( m is not in S') ) {
-    // add m to S'
-    // }
-    //
-    // if (S' is empty)
-    // return empty set
-    //
-    // At this point, S' is not empty and it contains the nodes that
-    // can be reached from S by consuming the character c directly
-    //
-    //
-    // 2. find all nodes that can be reached from the resulting
-    // set S' by consuming no input
-    //
-    // changed = true
-    // S'' = empty set
-    // while (changed) {
-    // changed = false
-    // for every node n in S' {
-    // add n to S''
-    // for ever neighbor m of n {
-    // if ( (the edge from n to m labeled with '_') && ( m is not in S'') )
-    // add m to S''
-    // }
-    // }
-    // if (S' not equal to S'') {
-    // changed = true;
-    // S' = S''
-    // S'' = empty set
-    // }
-    // }
-    //
-    // at this point the set S' contains all nodes that can be reached
-    // from S by first consuming C, then traversing 0 or more epsilon
-    // edges
-    //
-    // return S'
-
 }

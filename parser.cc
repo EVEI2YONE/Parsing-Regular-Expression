@@ -15,6 +15,9 @@
 
 using namespace std;
 
+Track *list = new Track();
+int num = 1;
+
 void Parser::syntax_error()
 {
 	cout << "SYNTAX ERROR\n";
@@ -50,41 +53,31 @@ Token Parser::peek()
 void Parser::parse_input()
 {
 	//input -> tokens_section INPUT_TEXT
-	Track *list = parse_tokens_section();
+	list = new Track();
+	parse_tokens_section();
 	Token str = expect(INPUT_TEXT);
-	cout << str << endl;
-	cin >> str;
+	cout << str.lexeme << endl;
+	cin >> str.lexeme;
 
-	//analyzer.my_LexicalAnalysis(list, str.lexeme, 0);
+	analyzer.my_LexicalAnalysis(list, str.lexeme, 0);
 	//my_LexicalAnalysis(list, str.lexeme, 0);
 	//this is where I need to get the list of inputs and stuff??<-----------
 }
 
 
-Track* Parser::parse_tokens_section()
+void Parser::parse_tokens_section()
 {
 	// tokens_section -> token_list HASH
 	//the overall variable is the list that is a list of structures passed through to my_LexicalAnalysis parameter
-	Track *overall = parse_token_list();
-	expect(HASH)
-	return overall;
+	parse_token_list();
+	expect(HASH);
 }
 
-Track* Parser::parse_token_list()
+void Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
-
-
-
-	// creating a REG_list
-	//REG_list *ptr =
 	parse_token();
-	//ptr->next = REG_head;
-	//REG_head = ptr;
-	//ptr = nullptr;
-
-
 	//check if next token is # or ,
 	Token t = peek();
 	if (t.token_type == COMMA)
@@ -95,10 +88,6 @@ Track* Parser::parse_token_list()
 	}
 	else if (t.token_type == HASH)
 	{
-		Track *list;
-		list->reg_pointer = REG_head;
-		list->token_pointer = Token_head;
-		return list;
 		// token_list -> token
 	}
 	else
@@ -111,19 +100,22 @@ Track* Parser::parse_token_list()
 void Parser::parse_token()
 {
 	// token -> ID expr
-	Token_list *temp_token;
-	temp_token->tokptr = expect(ID);
-	temp_token->next = Token_head;
-	Token_head = temp_token;
+	Token_list *temp_token = new Token_list();
+	Token temp1 = expect(ID);
+	temp_token->tok_ptr = new Token();
+	temp_token->tok_ptr->line_no = temp1.line_no;
+	temp_token->tok_ptr->lexeme = temp1.lexeme;
+	temp_token->tok_ptr->token_type = temp1.token_type;
+	temp_token->next = list->list_pointer;
+	list->list_pointer = temp_token;
 	temp_token = nullptr;
 
-	REG *expression = parse_expr();
 	REG_list *temp_expr;
-	temp_expr->expr = expression;
-	temp_expr->next = REG_head;
-	REG_head = temp_expr;
-	expression = nullptr;
+	temp_expr->expr = parse_expr();
+	temp_expr->next = list->reg_pointer;
+	list->reg_pointer = temp_expr;
 	temp_expr = nullptr;
+	num = 1;
 	return;
 }
 //returns REG pointer
@@ -178,9 +170,9 @@ REG* Parser::parse_expr()
 		Token t2 = lexer.GetToken();
 		if (t2.token_type == DOT || t2.token_type == OR) {
 			expect(LPAREN);
-			num++;
 			REG *temp = parse_expr();
 			if(t2.token_type == DOT){
+				expression->accept->first_label = '_';
 				expression->accept->first_neighbor = temp->start;
 				expression->accept = temp->accept;
 			}
@@ -205,11 +197,13 @@ REG* Parser::parse_expr()
 
 				//reassign expression start and accept pointers
 				expression->start = fork_node;
-				expression->accept = expression->accept->first_neighbor;
-				num++;
+				expression->accept = accept_node;
+				temp->accept = nullptr;
+				temp->start = nullptr;
 				fork_node->node_num = num;
 				num++;
 				accept_node->node_num = num;
+				num++;
 			}
 			//temp is no longer needed
 			expect(RPAREN);
@@ -217,23 +211,27 @@ REG* Parser::parse_expr()
 		else if (t2.token_type == STAR){
 			REG_node *fork_node;
 			REG_node *accept_node;
-			num++;
 			fork_node->node_num = num;
 			num++;
 			accept_node->node_num = num;
+			num++;
+
 			//set up and link fork node to expression->start and accept_node
 			fork_node->first_neighbor = expression->start;
 			fork_node->first_label = '_';
 			fork_node->second_neighbor = accept_node;
 			fork_node->second_label = '_';
+
 			//set up accept_node
 			accept_node->first_neighbor = nullptr;
 			accept_node->second_neighbor = nullptr;
+
 			//change expression->accept first, that way second neighbor can have easier access to previous neighbor
 			expression->accept->first_neighbor = accept_node;
 			expression->accept->first_label = '_';
 			expression->accept->second_neighbor = expression->start;
 			expression->accept->second_label = '_';
+
 			//now that expression->accept is set up, reassign start/accept pointers in expression
 			expression->start = fork_node;
 			expression->accept = accept_node;
