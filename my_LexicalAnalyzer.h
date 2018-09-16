@@ -27,10 +27,10 @@ struct REG_list {
 
 class Token_list{
 public:
-    Token *tok_ptr;
+    Token tok_ptr;
     Token_list *next;
     Token_list(){
-        tok_ptr = NULL;
+        //tok_ptr;
         next = NULL;
     }
 };
@@ -51,9 +51,8 @@ struct set_of_nodes{
     set_of_nodes *next;
 };
 
-struct set_of_sets{
-    set_of_nodes *s_node;
-    set_of_sets *next;
+struct set_of_ints{
+    set_of_ints *next;
     int longest;
 };
 
@@ -61,14 +60,16 @@ class my_LexicalAnalyzer {
 public:
     Track *list;
     std::string inputText;
-    set_of_sets *sets_head;
-    int length = 0;
+    set_of_ints *sets_head;
+    set_of_ints *shparser;
+    int length;
 
     my_LexicalAnalyzer(Track *l, std::string s);
     void my_getToken(std::string, int position);
     void match(REG *r, std::string S, int p);
     set_of_nodes* match_one_char(set_of_nodes *S, char c);
-    void free_set();
+    void free_set(set_of_ints *object);
+    void free_node(set_of_nodes *object);
 };
 
 #endif //CSE340_PROJECT1_MY_LEXICALANALYZER_H

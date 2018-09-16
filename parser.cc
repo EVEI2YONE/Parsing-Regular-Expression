@@ -21,7 +21,7 @@ int num = 1;
 
 void Parser::syntax_error()
 {
-	cout << "SYNTAX ERROR\n";
+	cout << "SYNTAX ERROR" << endl;
 	exit(1);
 }
 
@@ -57,8 +57,9 @@ void Parser::parse_input()
 	list = new Track();
 	parse_tokens_section();
 	Token str = expect(INPUT_TEXT);
-	cout << str.lexeme << endl;
-	my_LexicalAnalyzer(list, str.lexeme);
+	int a = (int)(str.lexeme.size()) - 2;
+	std::string t = str.lexeme.substr(1, a);
+	my_LexicalAnalyzer(list, t);
 }
 
 
@@ -74,6 +75,7 @@ void Parser::parse_token_list()
 {
 	// token_list -> token
 	// token_list -> token COMMA token_list
+	num = 1;
 	parse_token();
 	//check if next token is # or ,
 	Token t = peek();
@@ -91,7 +93,6 @@ void Parser::parse_token_list()
 	{
 		syntax_error();
 	}
-	num = 1;
 }
 //returns a REG pointer because a list of REG needs to be created
 void Parser::parse_token()
@@ -99,11 +100,8 @@ void Parser::parse_token()
 	// token -> ID expr
 	//new token to be inserted
 	Token_list *temp_token = new Token_list();
-	Token temp1 = expect(ID);
-	temp_token->tok_ptr = new Token();
-	temp_token->tok_ptr->line_no = temp1.line_no;
-	temp_token->tok_ptr->lexeme = temp1.lexeme;
-	temp_token->tok_ptr->token_type = temp1.token_type;
+	temp_token->tok_ptr = expect(ID);
+	temp_token->next = NULL;
 
 	//new REG expression graph to be inserted
 	REG_list* temp_expr = new REG_list;
@@ -121,10 +119,10 @@ void Parser::parse_token()
 	}
 	else {
 		//find the end of linked list
-		do {
+		while (lpparser->next != NULL) {
 			teparser = teparser->next;
 			lpparser = lpparser->next;
-		} while (lpparser->next != NULL);
+		}
 		//insert temp_token and temp_expr
 		lpparser->next = temp_token;
 		teparser->next = temp_expr;

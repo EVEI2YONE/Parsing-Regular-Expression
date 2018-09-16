@@ -18,11 +18,9 @@ private:
 
     struct REG* parse_expr();
     void parse_input();
-    void parse_char_list();
     void parse_tokens_section();
     void parse_token_list();
     void parse_token();
-
 
 public:
     void ParseProgram();
