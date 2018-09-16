@@ -15,17 +15,17 @@
 using namespace std;
 
 string reserved[] = { "END_OF_FILE",
-"COMMA", "LPAREN", "RPAREN",
-"DOT", "ID", "ERROR", "INPUT_TEXT", "HASH",
-"CHAR", "UNDERSCORE", "OR", "SYMBOL", "STAR" };
+					  "COMMA", "LPAREN", "RPAREN",
+					  "DOT", "ID", "ERROR", "INPUT_TEXT", "HASH",
+					  "CHAR", "UNDERSCORE", "OR", "SYMBOL", "STAR" };
 
 
 
 void Token::Print()
 {
 	cout << "{" << this->lexeme << " , "
-		<< reserved[(int)this->token_type] << " , "
-		<< this->line_no << "}\n";
+		 << reserved[(int)this->token_type] << " , "
+		 << this->line_no << "}\n";
 }
 
 LexicalAnalyzer::LexicalAnalyzer()
@@ -211,58 +211,58 @@ Token LexicalAnalyzer::GetToken()
 	tmp.line_no = line_no;	//--------------i don't know when line_no is incremented
 	input.GetChar(c);
 	switch (c) {
-	case '.':
-		tmp.token_type = DOT;
-		return tmp;
-	case '*':
-		tmp.token_type = STAR;
-		return tmp;
+		case '.':
+			tmp.token_type = DOT;
+			return tmp;
+		case '*':
+			tmp.token_type = STAR;
+			return tmp;
 
-	case ',':
-		tmp.token_type = COMMA;
-		return tmp;
+		case ',':
+			tmp.token_type = COMMA;
+			return tmp;
 
-	case '(':
-		tmp.token_type = LPAREN;
-		return tmp;
-	case ')':
-		tmp.token_type = RPAREN;
-		return tmp;
+		case '(':
+			tmp.token_type = LPAREN;
+			return tmp;
+		case ')':
+			tmp.token_type = RPAREN;
+			return tmp;
 
-		//UNDERSCORE
-	case '_':
-		tmp.token_type = UNDERSCORE;
-		return tmp;
+			//UNDERSCORE
+		case '_':
+			tmp.token_type = UNDERSCORE;
+			return tmp;
 
-		//HASH
-	case '#':
-		tmp.token_type = HASH;
-		return tmp;
-		//OR
-	case '|':
-		tmp.token_type = OR;
-		return tmp;
-		//INPUT
-	case '"':
-		input.UngetChar(c);
-		return ScanInput();
-	default:
-		if (isdigit(c)) {
-			//CHAR
-			//input.UngetChar(c);
-			//return ScanNumber();
-			tmp.token_type = CHAR;
-			tmp.lexeme = c;
-		}
-		else if (isalpha(c)) {
+			//HASH
+		case '#':
+			tmp.token_type = HASH;
+			return tmp;
+			//OR
+		case '|':
+			tmp.token_type = OR;
+			return tmp;
+			//INPUT
+		case '"':
 			input.UngetChar(c);
-			return ScanIdOrChar();
-		}
-		else if (input.EndOfInput())
-			tmp.token_type = END_OF_FILE;
-		else
-			tmp.token_type = ERROR;
+			return ScanInput();
+		default:
+			if (isdigit(c)) {
+				//CHAR
+				//input.UngetChar(c);
+				//return ScanNumber();
+				tmp.token_type = CHAR;
+				tmp.lexeme = c;
+			}
+			else if (isalpha(c)) {
+				input.UngetChar(c);
+				return ScanIdOrChar();
+			}
+			else if (input.EndOfInput())
+				tmp.token_type = END_OF_FILE;
+			else
+				tmp.token_type = ERROR;
 
-		return tmp;
+			return tmp;
 	}
 }

@@ -58,11 +58,7 @@ void Parser::parse_input()
 	parse_tokens_section();
 	Token str = expect(INPUT_TEXT);
 	cout << str.lexeme << endl;
-	cin >> str.lexeme;
-
-	analyzer.my_LexicalAnalysis(list, str.lexeme, 0);
-	//my_LexicalAnalysis(list, str.lexeme, 0);
-	//this is where I need to get the list of inputs and stuff??<-----------
+	my_LexicalAnalyzer(list, str.lexeme);
 }
 
 
@@ -101,23 +97,41 @@ void Parser::parse_token_list()
 void Parser::parse_token()
 {
 	// token -> ID expr
+	//new token to be inserted
 	Token_list *temp_token = new Token_list();
 	Token temp1 = expect(ID);
 	temp_token->tok_ptr = new Token();
 	temp_token->tok_ptr->line_no = temp1.line_no;
 	temp_token->tok_ptr->lexeme = temp1.lexeme;
 	temp_token->tok_ptr->token_type = temp1.token_type;
-	temp_token->next = list->list_pointer;
-	list->list_pointer = temp_token;
-	temp_token = NULL;
 
-	REG_list *temp_expr;
+	//new REG expression graph to be inserted
+	REG_list* temp_expr = new REG_list;
+	temp_expr->next = NULL;
 	temp_expr->expr = parse_expr();
-	temp_expr->next = list->reg_pointer;
-	list->reg_pointer = temp_expr;
+
+	//prep to insert at end
+	Token_list *lpparser = list->list_pointer; //lpparser = list_pointer_parser
+	REG_list *teparser = list->reg_pointer; //teparser = temp_expr_parser
+
+	//lpparser and teparser will be incremented at the same time, so only need to follow one
+	if (lpparser == NULL) {
+		list->list_pointer = temp_token;
+		list->reg_pointer = temp_expr;
+	}
+	else {
+		//find the end of linked list
+		do {
+			teparser = teparser->next;
+			lpparser = lpparser->next;
+		} while (lpparser->next != NULL);
+		//insert temp_token and temp_expr
+		lpparser->next = temp_token;
+		teparser->next = temp_expr;
+	}
+	temp_token = NULL;
 	temp_expr = NULL;
-	num = 1;
-	return;
+	num = 1; //used to indicate node_num in REG graphs/expressions
 }
 //returns REG pointer
 //this also means that the REG_expression is created recursively
@@ -133,21 +147,21 @@ REG* Parser::parse_expr()
 	if (t.token_type == CHAR || t.token_type == UNDERSCORE) {
 		// expr -> CHAR
 		//create start and accept REG
-		REG *expression;
+		REG *expression = new REG;
 		//start->char->accept
 		//node_1 represents the start node
 		//while node_2 is the accept node
-		REG_node *node_1;
-		REG_node *node_2;
+		REG_node *node_1 = new REG_node;
+		REG_node *node_2 = new REG_node;
 
 		//create single character REG expression
 		node_1->first_neighbor = node_2;
 		node_1->second_neighbor = NULL;
-		if(t.token_type == CHAR) {
-			node_1->first_label = CHAR;
+		if (t.token_type == CHAR) {
+			node_1->first_label = t.lexeme[0];
 		}
-		else{
-			node_1->first_label = UNDERSCORE;
+		else {
+			node_1->first_label = '_';
 		}
 
 		node_2->first_neighbor = NULL;
@@ -172,13 +186,13 @@ REG* Parser::parse_expr()
 		if (t2.token_type == DOT || t2.token_type == OR) {
 			expect(LPAREN);
 			REG *temp = parse_expr();
-			if(t2.token_type == DOT){
+			if (t2.token_type == DOT) {
 				expression->accept->first_label = '_';
 				expression->accept->first_neighbor = temp->start;
 				expression->accept = temp->accept;
 			}
-			else{
-				REG_node *fork_node;
+			else {
+				REG_node *fork_node = new REG_node;
 				//have the fork node point the the start of expression and temp nodes
 				fork_node->first_neighbor = expression->start;
 				fork_node->first_label = '_';
@@ -186,7 +200,7 @@ REG* Parser::parse_expr()
 				fork_node->second_label = '_';
 
 				//set up accept node
-				REG_node *accept_node;
+				REG_node *accept_node = new REG_node;
 				accept_node->first_neighbor = NULL;
 				accept_node->second_neighbor = NULL;
 
@@ -209,9 +223,9 @@ REG* Parser::parse_expr()
 			//temp is no longer needed
 			expect(RPAREN);
 		}
-		else if (t2.token_type == STAR){
-			REG_node *fork_node;
-			REG_node *accept_node;
+		else if (t2.token_type == STAR) {
+			REG_node *fork_node = new REG_node;
+			REG_node *accept_node = new REG_node;
 			fork_node->node_num = num;
 			num++;
 			accept_node->node_num = num;
@@ -257,4 +271,6 @@ int main()
 	Parser parser;
 	//----------------------------prompt the user for some input
 	parser.ParseProgram(); //function above
+
+
 }
