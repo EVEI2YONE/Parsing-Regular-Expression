@@ -11,9 +11,7 @@ my_LexicalAnalyzer::my_LexicalAnalyzer(Track* l, std::string s) {
     this->list = l;
     this->inputText = s;
     sets_head = NULL;
-    my_getToken(s, 0);
-
-    //my_getToken(inputText, 0);
+    my_getToken(s, 0);	//<-------MY_GETTOKEN CALLED
     shparser = sets_head;
     free_set();
     sets_head = NULL;
@@ -59,19 +57,22 @@ void my_LexicalAnalyzer::my_getToken(std::string s, int p){
     shparser = sets_head;
     REG_list *rhparser = list->reg_pointer;
     do {
-        match(rhparser->expr, a, p);
+        match(rhparser->expr, a, p);   //<-----------MATCH FUNCTION CALLED
     } while(rhparser->next != NULL);
+    //if (1) {
+
+    //}
     //reset shparser - shparser inserting new set_of_sets objects within match function at the tail
     shparser = sets_head;
     length = shparser->longest;
     //find longest lexeme
     //shparser parses sets_head <- holds all lengths in order relative to each reg_expr list
-    do {
+    while(shparser->next != NULL){
         if (shparser->longest > length) {
             length = shparser->longest;
         }
         shparser = shparser->next;
-    } while (shparser->next != NULL);
+    }
     //check if entire list was -1 <- suggests that NO EXPRESSION MATCHED
     if (length == -1) {
         cout << "ERROR" << endl;
@@ -114,8 +115,9 @@ void my_LexicalAnalyzer::match(REG *r, string s, int p){
 
     //now temp1 will continue to have the current set of nodes
     //keep in mind that match_one_char can return NULL
-    if (shparser == NULL) {
-        shparser = setTemp;
+    if (sets_head == NULL) {
+        sets_head = setTemp;
+        shparser = sets_head;
     }
     else {
         shparser->next = setTemp;
@@ -156,23 +158,29 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         //assume the set_of_nodes are all epsilon - aka initial letter
         //then all the epsilon nodes are being parsed by the parser in the large do-while loop <------------ASSOCIATED IF COMMENTED OUT PARTS ARE TRUE
         //by the end of char check, S should be updated...to follow suit with epsilon nodes
+        //free_set(parser->);
+
+        //AT SOME POINT, I NEED TO CLEAR THE SET OF NODES AFTER CHAR HAS BEEN WENT THROUGH
         update = NULL;
         while (parser->next != NULL) //check all nodes for matching char
         {
             if (parser->node->first_label == c) {
                 set_of_nodes *temp1 = new set_of_nodes;
-                temp1->node = parser->node;
+                temp1->node = parser->node;	//<----------------------------DOUBLE CHECK
                 temp1->next = update;
                 update = temp1;
             }
             parser = parser->next;
         }
+        //after char is parserd, change to '_' to find set of epsilon nodes
+        c = '_';
         S = update;
         update = NULL;
         parser = S;
         if (S == NULL) {
             return NULL;
         }
+        //<-----------------------DO I DO ANYTHING?
     }
     // step 1 is the purpose of the do-while loop <-------------------ASSOCIATED IF COMMENTED OUT PARTS ARE TRUE
     //set_of_nodes has REG_node and set_of_nodes pointers
@@ -237,7 +245,6 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         find_end = NULL;
     }
     else{
-        cout << "my_LexicalAnalysis match_one_char expression" << endl;
         update = S;
     }
     //} while (parser->next != NULL); <--------------COMMENTED OUT
