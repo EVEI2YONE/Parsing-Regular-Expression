@@ -59,9 +59,9 @@ void my_LexicalAnalyzer::my_getToken(std::string s, int p){
     do {
         match(rhparser->expr, a, p);   //<-----------MATCH FUNCTION CALLED
     } while(rhparser->next != NULL);
-    //if (1) {
+//	if (1) {
 
-    //}
+//	}
     //reset shparser - shparser inserting new set_of_sets objects within match function at the tail
     shparser = sets_head;
     length = shparser->longest;
@@ -87,7 +87,9 @@ void my_LexicalAnalyzer::my_getToken(std::string s, int p){
         tlparser = tlparser->next;
     }
     cout << tlparser->tok_ptr->lexeme << " , \"" << a.substr(0, length + 1) << "\"" << endl;
-    my_getToken(a, 0);
+    int b = a.size() - length;
+    std::string str_temp = a.substr(length, b);
+    my_getToken(str_temp, 0);
     return;
 }
 
@@ -124,8 +126,9 @@ void my_LexicalAnalyzer::match(REG *r, string s, int p){
         shparser = setTemp;
         setTemp = NULL;
     }
+    //confusion considering a single expression such as (a)
     while (temp1 != NULL && p < s.length()) {
-        temp1 = match_one_char(temp1, s[p]);
+        temp1 = match_one_char(temp1, s[p]);	//at this point, the previous set needs to be freed before being updated - should occur when char node is reached?
         //temp1 has an item still
         //there is still some string left to explore
         length++;
@@ -146,7 +149,8 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     // 3. new set_of_nodes list needs to be created and returned
     set_of_nodes *update;
     set_of_nodes *parser = S;
-    if (parser == NULL){
+    //what reason would the parser be set to NULL? <----------------------HONEST QUESTION
+    if (parser == NULL) {
         return NULL;
     }
     //check if char
@@ -156,7 +160,6 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     //- this could be due to DOT operator which may follow up with a STAR or OR operator
     if (c != '_') {
         //assume the set_of_nodes are all epsilon - aka initial letter
-        //then all the epsilon nodes are being parsed by the parser in the large do-while loop <------------ASSOCIATED IF COMMENTED OUT PARTS ARE TRUE
         //by the end of char check, S should be updated...to follow suit with epsilon nodes
         //free_set(parser->);
 
@@ -174,6 +177,7 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         }
         //after char is parserd, change to '_' to find set of epsilon nodes
         c = '_';
+        //free_node(S); <-----S will be updated with all char nodes, remove previous list of nodes, then S will be updated with epsilon nodes
         S = update;
         update = NULL;
         parser = S;
@@ -182,7 +186,6 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         }
         //<-----------------------DO I DO ANYTHING?
     }
-    // step 1 is the purpose of the do-while loop <-------------------ASSOCIATED IF COMMENTED OUT PARTS ARE TRUE
     //set_of_nodes has REG_node and set_of_nodes pointers
     //do {<---------------COMMENTED OUT
     //create new set_of_nodes for viable nodes
@@ -197,6 +200,7 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         //temp1 explores parser's 1st and only neighbor
         set_of_nodes *temp1 = new set_of_nodes;
         temp1->node = parser->node->first_neighbor;
+        temp1->next = NULL;
         temp1->next = match_one_char(temp1, c);
         return temp1;
     }//1st and 2nd neighbors have epsilons
@@ -208,22 +212,26 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
         //temp1 explores parser's 1st neighbor
         set_of_nodes *temp1 = new set_of_nodes;
         temp1->node = parser->node->first_neighbor;
+        temp1->next = NULL;
         temp1->next = match_one_char(temp1, c);
 
         //temp2 explores parser's 2nd neighbor
         set_of_nodes *temp2 = new set_of_nodes;
         temp2->node = parser->node->second_neighbor;
+        temp2->next = NULL;
         temp2->next = match_one_char(temp2, c);
 
-        set_of_nodes *parse1 = temp1;
+        set_of_nodes *parse1;
         set_of_nodes *parse2 = temp2;
         do {
+            parse1 = temp1;
             int flag = 0;
             do {
                 if(parse1->node->node_num == parse2->node->node_num) {
                     flag = 1;
                 }
-            }while(parse1->next != NULL);
+                parse1 = parse1->next;
+            }while(parse1 != NULL);
             //flag = 1 means there is a copy node pointer
             //flag = 0 means to add the node that parse2 is pointing at to temp_list
             if(flag == 0) {
@@ -234,11 +242,13 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
                 update = temp3;
                 temp3 = NULL;
             }
-        }while(parse2->next != NULL);
+            parse2 = parse2->next;
+        }while(parse2 != NULL);
+
         set_of_nodes *find_end = temp1;
-        do {
+        while(find_end->next != NULL){
             find_end = find_end->next;
-        } while (find_end->next != NULL);
+        }
         find_end->next = update;
         update = temp1;
         temp1 = NULL;
@@ -247,8 +257,6 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     else{
         update = S;
     }
-    //} while (parser->next != NULL); <--------------COMMENTED OUT
-
     return update;
 }
 
