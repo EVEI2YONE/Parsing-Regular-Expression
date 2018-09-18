@@ -10,41 +10,26 @@ my_LexicalAnalyzer::my_LexicalAnalyzer(Track* l, std::string s) {
     length = 0;
     this->list = l;
     this->inputText = s;
-    //sets_head holds lengths of successful iterations of the REG graphs
     sets_head = NULL;
-    //get string without spaces
-    int t = 0;
-    for (int i = 0; s[i] == ' '; i++) {
-        t++;
-    }
-    int len = inputText.size() - t;
-    std::string a = inputText.substr(t, len);
-    my_getToken(a, 0);	//<-------------------------MY_GETTOKEN FUNCTION CALLED
-    //shparser = sets_head;
-    //free_set();
-    //sets_head = NULL;
+    my_getToken(s, 0);
+
+    //my_getToken(inputText, 0);
+    shparser = sets_head;
+    free_set();
+    sets_head = NULL;
 }
 
-void my_LexicalAnalyzer::free_set(set_of_ints *object) {
-    if (object->next != NULL) {
-        free_set(object->next);
+void my_LexicalAnalyzer::free_set() {
+    if (shparser->next != NULL) {
+        shparser = shparser->next;
     }
-    free(object);
+    delete shparser;
     return;
 }
-
-void my_LexicalAnalyzer::free_node(set_of_nodes *object) {
-    if (object->next != NULL) {
-        object->node = NULL;
-        free_node(object->next);
-    }
-    free(object);
-}
-
 //list contains all tokens and all REG graphs or expressions
 //s is the input text at position p
 //take note that when p = 0, the text has yet to be parsed
-void my_LexicalAnalyzer::my_getToken(std::string s, int p) {
+void my_LexicalAnalyzer::my_getToken(std::string s, int p){
     /*
     my_getToken <- should print longest string for token, however many times necessary
     - run through final updated lengths from match
@@ -54,70 +39,53 @@ void my_LexicalAnalyzer::my_getToken(std::string s, int p) {
     */
     if (list->reg_pointer == NULL) {
         cout << "ERROR" << endl;
-        //exit(1);
+        exit(1);
+    }
+    if (p == s.length()) {
         return;
     }
-    if (p > s.size() - 1) {
-        return;
-    }
-    //shparser will parse through all the numbers to find the longest length eventually
-    shparser = sets_head;
-    REG_list *rpparser = list->reg_pointer;	//rpparser is reg_pointer_parser
-    Token_list *tlp = list->list_pointer;
-    do {
-        match(rpparser->expr, s, 0);	//<---------------------MATCH FUNCTION CALLED
-        if (length == s.size()) {
-            cout << tlp->tok_ptr.lexeme << " , \"" << s << "\"" << endl;
-            length = 0;
-            return;
-        }
-        rpparser = rpparser->next;
-        tlp = tlp->next;
-    } while (rpparser->next != NULL);
-    tlp = NULL;
-    //reset shparser - shparser inserting new set_of_ints objects within match function at the tail
-    shparser = sets_head;
-    length = shparser->longest;
-    //find longest lexeme
-    //shparser parses sets_head <- holds all lengths in order relative to each reg_expr list
-    if (shparser->next != NULL) {
-        do {
-            if (shparser->longest > length) {
-                length = shparser->longest;
-            }
-            shparser = shparser->next;
-        } while (shparser->next != NULL);
-    }
-    //check if entire list was -1 <- suggests that NO EXPRESSION MATCHED
-    if (length == -1) {
-        cout << "ERROR" << endl;
-        //exit(1);
-        return;
-    }
-    //print out appropriate token, lexeme
-    shparser = sets_head;
-    //find longest length in set_of_ints while incrementing list->list_pointer parser
-    Token_list *tlparser = list->list_pointer;
-    while (shparser->longest != length) {
-        tlparser = tlparser->next;
-        shparser = shparser->next;
-    }
-    if (length == 0) {
-        cout << tlparser->tok_ptr.lexeme << " , \"\"" << endl;
-    }
-    else {
-        cout << tlparser->tok_ptr.lexeme << " , \"" << s.substr(0, length) << "\"" << endl;
-    }
+
+    //get string without spaces
     int t = 0;
     for (int i = 0; s[i] == ' ' || s[i] == '\n'; i++) {
         t++;
     }
-    int len = s.size() - t;
+    int len = s.length() - t;
     std::string a = s.substr(t, len);
-    shparser = sets_head;
-    free_set(shparser);
+
+    //sets_head holds lengths of successful iterations of the REG graphs
     sets_head = NULL;
-    shparser = NULL;
+    //shparser will parse through all the numbers to find the longest length eventually
+    shparser = sets_head;
+    REG_list *rhparser = list->reg_pointer;
+    do {
+        match(rhparser->expr, a, p);
+    } while(rhparser->next != NULL);
+    //reset shparser - shparser inserting new set_of_sets objects within match function at the tail
+    shparser = sets_head;
+    length = shparser->longest;
+    //find longest lexeme
+    //shparser parses sets_head <- holds all lengths in order relative to each reg_expr list
+    do {
+        if (shparser->longest > length) {
+            length = shparser->longest;
+        }
+        shparser = shparser->next;
+    } while (shparser->next != NULL);
+    //check if entire list was -1 <- suggests that NO EXPRESSION MATCHED
+    if (length == -1) {
+        cout << "ERROR" << endl;
+        exit(1);
+    }
+    //print out appropriate token, lexeme
+    shparser = sets_head;
+    //find longest length in set_of_sets while incrementing list->list_pointer parser
+    Token_list *tlparser = list->list_pointer;
+    while (shparser->longest != length) {
+        shparser = shparser->next;
+        tlparser = tlparser->next;
+    }
+    cout << tlparser->tok_ptr->lexeme << " , \"" << a.substr(0, length + 1) << "\"" << endl;
     my_getToken(a, 0);
     return;
 }
@@ -133,12 +101,16 @@ void my_LexicalAnalyzer::match(REG *r, string s, int p){
     set_of_nodes *object = new set_of_nodes;
     object->next = NULL;
     object->node = r->start;
+    set_of_nodes *temp1;
 
-    //initialize set_of_ints object
-    set_of_ints *setTemp = new set_of_ints;
+    //initialize set_of_sets object
+    set_of_sets *setTemp = new set_of_sets;
     setTemp->longest = -1;	//keeps track if NULL returned without accept node being reached
     //this means there was an unrecognizeable char
     setTemp->next = NULL;
+
+    //need initial set_of_nodes from REG r
+    temp1 = match_one_char(object, '_');
 
     //now temp1 will continue to have the current set of nodes
     //keep in mind that match_one_char can return NULL
@@ -148,20 +120,15 @@ void my_LexicalAnalyzer::match(REG *r, string s, int p){
     else {
         shparser->next = setTemp;
         shparser = setTemp;
+        setTemp = NULL;
     }
-    setTemp = NULL;
-
-    //need initial set_of_nodes from REG r
-    object = match_one_char(object, '_');	//<------------------MATCH_ONE_CHAR FUNCTION CALLED
-    //NULL indicates that there is no more string left to explore
-    //p == s.size() indicates that end of string has been parsed
-    while (object != NULL && p < s.size()) {
+    while (temp1 != NULL && p < s.length()) {
+        temp1 = match_one_char(temp1, s[p]);
+        //temp1 has an item still
+        //there is still some string left to explore
         length++;
-        object = match_one_char(object, s[p]);	//update object's set_of_nodes <------MATCH_ONE_FUNCTION CALLED
         p++;
     }
-    free_node(object);
-    return;
 }
 
 set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
@@ -173,7 +140,7 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     */
     // Goal: find all nodes that can be reached from S by consuming c
     // 1. parse through S (recursively) and list viable nodes that can be reached from S
-    // 2. if accept state is reached, update set_of_ints parser on - character, string length, or position <------------ set_of_ints longest updated with length further down at accept node point
+    // 2. if accept state is reached, update set_of_sets parser on - character, string length, or position <------------ set_of_sets longest updated with length further down at accept node point
     // 3. new set_of_nodes list needs to be created and returned
     set_of_nodes *update;
     set_of_nodes *parser = S;
@@ -186,11 +153,12 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
     //there could be more epsilon nodes following suite
     //- this could be due to DOT operator which may follow up with a STAR or OR operator
     if (c != '_') {
-        length++;
         //assume the set_of_nodes are all epsilon - aka initial letter
+        //then all the epsilon nodes are being parsed by the parser in the large do-while loop <------------ASSOCIATED IF COMMENTED OUT PARTS ARE TRUE
         //by the end of char check, S should be updated...to follow suit with epsilon nodes
         update = NULL;
-        do {
+        while (parser->next != NULL) //check all nodes for matching char
+        {
             if (parser->node->first_label == c) {
                 set_of_nodes *temp1 = new set_of_nodes;
                 temp1->node = parser->node;
@@ -198,7 +166,7 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
                 update = temp1;
             }
             parser = parser->next;
-        } while (parser->next != NULL); //check all nodes for matching char
+        }
         S = update;
         update = NULL;
         parser = S;
@@ -206,7 +174,9 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
             return NULL;
         }
     }
+    // step 1 is the purpose of the do-while loop <-------------------ASSOCIATED IF COMMENTED OUT PARTS ARE TRUE
     //set_of_nodes has REG_node and set_of_nodes pointers
+    //do {<---------------COMMENTED OUT
     //create new set_of_nodes for viable nodes
     //accept node
     if(S->node->first_neighbor == NULL){
@@ -245,7 +215,6 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
                 if(parse1->node->node_num == parse2->node->node_num) {
                     flag = 1;
                 }
-                parse1 = parse1->next;
             }while(parse1->next != NULL);
             //flag = 1 means there is a copy node pointer
             //flag = 0 means to add the node that parse2 is pointing at to temp_list
@@ -257,22 +226,21 @@ set_of_nodes* my_LexicalAnalyzer::match_one_char(set_of_nodes *S, char c){
                 update = temp3;
                 temp3 = NULL;
             }
-            parse2 = parse2->next;
         }while(parse2->next != NULL);
         set_of_nodes *find_end = temp1;
-        while (find_end->next != NULL) {
+        do {
             find_end = find_end->next;
-        }
+        } while (find_end->next != NULL);
         find_end->next = update;
         update = temp1;
         temp1 = NULL;
         find_end = NULL;
     }
     else{
-        //cout << "my_LexicalAnalysis match_one_char expression" << endl;
-        //update = S;
-        update = NULL;
+        cout << "my_LexicalAnalysis match_one_char expression" << endl;
+        update = S;
     }
+    //} while (parser->next != NULL); <--------------COMMENTED OUT
 
     return update;
 }
